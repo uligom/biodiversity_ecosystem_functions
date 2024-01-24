@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/747640054.svg)](https://zenodo.org/doi/10.5281/zenodo.10561533)
+[![DOI](https://zenodo.org/badge/747640054.svg)] (https://zenodo.org/doi/10.5281/zenodo.10561533)
 
 
 All analyses are described in meta_script.Rmd, including a listing of all scripts necessary to reproduce the results.
