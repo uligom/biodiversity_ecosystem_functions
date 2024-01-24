@@ -1,0 +1,45 @@
+Site ID,Site Name,IGBP,Latitude,Longitude,Elevation,MAT,MAP,Url
+ABBY,Abby Road NEON,ENF,45.76244,-122.33032,365,10,2451,https://www.dnr.wa.gov/
+BARR,Utqiaġvik NEON,WET,71.28241,-156.61936,4,-12,105,http://www.north-slope.org/departments/planning-community-services/applications-and-forms
+BART,Bartlett Experimental Forest NEON,DBF,44.06389,-71.28737,274,6.2,1325,https://www.nrs.fs.fed.us/ef/locations/nh/bartlett/
+BLAN,Blandy Experimental Farm NEON,DBF,39.0337,-78.04179,183,12.1,983,http://blandy.virginia.edu/research|
+BONA,Caribou-Poker Creeks Research Watershed NEON,ENF,65.15401,-147.50258,230,-3,262,https://www.uaf.edu/uaf/
+CLBJ,Lyndon B. Johnson National Grassland NEON,GRA,33.40123,-97.57,272,17.5,926,https://www.fs.usda.gov/detail/texas/about-forest/districts/?cid=fswdev3_008440
+CPER,Central Plains Experimental Range NEON,GRA,40.81554,-104.74559000000001,1654,8.6,344,https://www.ars.usda.gov/plains-area/fort-collins-co/center-for-agricultural-resources-research/rangeland-resources-systems-research/docs/rrsr/central-plains-experimental-research-location/
+DCFS,Dakota Coteau Field  NEON,GRA,47.16165,-99.10656,575,4.9,490,https://www.land.nd.gov/
+DEJU,Delta Junction NEON,ENF,63.88112,-145.75136,517,-3,305,https://www.blm.gov/office/eastern-interior-field-office
+DELA,Dead Lake NEON,MF,32.54173,-87.80388,25,17.6,1372,https://www.sam.usace.army.mil/
+DSNY,Disney Wilderness Preserve NEON,CVM,28.12505,-81.43619,20,22.5,1216,https://www.nature.org/en-us/get-involved/how-to-help/places-we-protect/the-disney-wilderness-preserve/
+GRSM,Great Smoky Mountains National Park NEON,DBF,35.68896,-83.50195,575,13.1,1375,https://irma.nps.gov/rprs/
+GUAN,Guanica Forest NEON,EBF,17.96955,-66.8687,125,23,840,NA
+HARV,Harvard Forest & Quabbin Watershed NEON,DBF,42.53691,-72.17265,348,7.4,1199,https://harvardforest.fas.harvard.edu/conducting-research|https://www.mass.gov/service-details/watershed-permits
+HEAL,Healy NEON,OSH,63.8758,-149.21335,677,-1.3,385,http://dnr.alaska.gov/
+JERC,The Jones Center At Ichauway NEON,ENF,31.19484,-84.46862,47,19.2,1308,http://www.jonesctr.org/research/
+JORN,Jornada Experimental Range NEON,OSH,32.59069,-106.84254,1324,15.7,271,https://jornada.nmsu.edu/
+KONA,Konza Prairie Agroecosystem NEON,GRA,39.11045,-96.61293,323,12.7,850,https://kpbs.konza.k-state.edu/scientist-information/permits.html
+KONZ,Konza Prairie Biological Station NEON,GRA,39.10077,-96.56307,414,12.4,870,https://kpbs.konza.k-state.edu/scientist-information/permits.html
+LENO,Lenoir Landing NEON,DBF,31.85386,-88.16118,13,18.1,1386,https://www.sam.usace.army.mil/|https://www.fws.gov/refuge/choctaw/
+MLBS,Mountain Lake Biological Station NEON,DBF,37.37831,-80.52485,1170,8.8,1227,https://mlbs.virginia.edu/resapp|https://www.fs.usda.gov/gwj/
+MOAB,Moab NEON,OSH,38.24828,-109.38827,1799,10.1,319,https://www.blm.gov/office/moab-field-office
+NIWO,Niwot Ridge NEON,ENF,40.05425,-105.58237,3490,0.3,1005,NA
+NOGP,Northern Great Plains Research Laboratory NEON,GRA,46.76972,-100.91535,589,5.9,457,https://www.ars.usda.gov/plains-area/mandan-nd/ngprl/
+OAES,Marvin Klemme Range Research Station NEON,GRA,35.4106,-99.05878,519,15.5,779,http://oaes.okstate.edu/
+ONAQ,Onaqui NEON,OSH,40.1776,-112.45245,1662,9,288,https://www.blm.gov/office/salt-lake-field-office
+ORNL,Oak Ridge NEON,DBF,35.96413,-84.28259,344,14.4,1340,https://www.ornl.gov/division/esd
+OSBS,Ordway-Swisher Biological Station NEON,ENF,29.68928,-81.99343,46,20.9,1302,https://ordway-swisher.ufl.edu/ResearchUse.aspx
+PUUM,Puu Makaala Natural Area Reserve NEON,EBF,19.55309,-155.31731,1685,12.7,2657,https://dlnr.hawaii.gov/ecosystems/nars/permits/
+RMNP,Rocky Mountains NEON,ENF,40.2759,-105.54596,2742,2.9,731,https://www.fs.usda.gov/arp
+SCBI,Smithsonian Conservation Biology Institute NEON,DBF,38.89292,-78.13949,352,11.6,1126,https://www.si.edu/unit/conservation-biology-institute
+SERC,Smithsonian Environmental Research Center NEON,DBF,38.89013,-76.56001,33,13.6,1075,https://serc.si.edu/
+SJER,San Joaquin Experimental Range NEON,SAV,37.10878,-119.73228,400,16.4,540,https://www.fs.fed.us/psw/ef/san_joaquin/
+SRER,Santa Rita Experimental Range NEON,OSH,31.91068,-110.83549,997,19.3,346,https://taac.arizona.edu/sites/taac.arizona.edu/files/SRER%20Range%20Use%20Agreement%202014%20revised%5B1%5D.pdf
+STEI,Steigerwaldt-Chequamegon NEON,DBF,45.50894,-89.58637,476,4.8,797,|https://www.fs.usda.gov/cnnf/
+TALL,Talladega National Forest NEON,ENF,32.95047,-87.39326,166,17.2,1383,https://www.fs.usda.gov/detail/alabama/about-forest/districts/?cid=fsbdev3_002555
+TEAK,Lower Teakettle NEON,ENF,37.00583,-119.00602,2149,8,1223,https://www.fs.usda.gov/sierra/
+TOOL,Toolik Field Station NEON,WET,68.66109,-149.37047,832,-9,316,https://toolik.alaska.edu/user_guide/permits.php
+TREE,Treehaven NEON,DBF,45.49369,-89.58571,467,4.8,797,https://www.uwsp.edu/cnr-ap/treehaven/Pages/Research-Form.aspx
+UKFS,KU Field Station NEON,DBF,39.04043,-95.19215,322,12.7,990,https://biosurvey.ku.edu/research
+UNDE,University of Notre Dame Environmental Research Center NEON,MF,46.23391,-89.53725,521,4.3,802,https://underc.nd.edu/underc-west/research-opportunities/
+WOOD,Chase Lake National Wildlife Refuge NEON,GRA,47.1282,-99.24133,591,4.9,494,https://www.fws.gov/refuge/chase_lake/
+WREF,Wind River Experimental Forest NEON,ENF,45.82049,-121.95191,351,9.2,2225,https://www.fs.usda.gov/pnw/
+YELL,Yellowstone National Park NEON,ENF,44.95348,-110.53914,2133,3.4,493,https://irma.nps.gov/rprs/

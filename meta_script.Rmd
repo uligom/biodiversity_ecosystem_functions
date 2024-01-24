@@ -1,0 +1,155 @@
+---
+title: "meta_script"
+author: "Ulisse Gomarasca"
+date: "2023-08-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Description
+
+This document calls all the necessary code scripts that are needed to run the analysis of biodiversity and ecosystem functional properties by Gomarasca et al., submitted.
+
+
+## Data processing
+Preparation of data for the analysis.
+Sentinel 2 data was pre-processed and downloaded in Google Earth Engine:
+https://code.earthengine.google.com/9274b8930259730af654e6910fd83bae
+https://code.earthengine.google.com/c5e4b08a8d0336479bca594279eb04f0
+
+
+```{r, echo = F}
+### Metadata -------------------------------------------------------------------
+## Site coordinates for Sentinel 2 cut-outs ----
+source("scripts/extract_sites.R")
+
+## Site coordinates, pft classes, and other metadata ----
+source("scripts/extract_site_info.R")
+
+
+
+### Climatic variables ---------------------------------------------------------
+source("scripts/extract_climate_NEON.R")
+
+
+
+### Structural variables -------------------------------------------------------
+## Vegetation structure ----
+source("scripts/extract_structure_NEON.R")
+
+
+## LAI ----
+source("scripts/extract_LAI_GBOV_NEON.R")
+
+
+
+### Biodiversity ---------------------------------------------------------------
+## Ground biodiversity ----
+source("scripts/calculate_site_biodiversity_indices_v06.R")
+
+
+
+## Rao's Q + max VIs ----
+# Pre-processing of cut-outs in Google Earth Engine by Ulisse Gomarasca, Marco Girardello, Guido Ceccherini
+# Calculation of estimatesin python by Javier Pacheco-Labrador
+source("scripts/extract_raoq_and_VImax.R")
+
+
+### Fluxes ---------------------------------------------------------------------
+## Extract transpiration at NEON sites ----
+# partitioned transpiration and evaporation estimates based on the TEA algorithm by Nelson et al., 2018
+source("scripts/extract_TEA_T_NEON.R")
+
+
+## Extract and calculate missing fluxes from NCAR-NEON product ----
+source("scripts/extract_fluxes_NCAR_NEON.R")
+
+
+
+### Ecosystem Functional Properties --------------------------------------------
+source("scripts/calculate_EFPs.R")
+
+
+
+#### Data Merge ----------------------------------------------------------------
+source("scripts/data_merge_NEON_4mumin.R")
+
+```
+
+
+## Analysis
+
+```{r, echo = F, include = F}
+### Multimodel Inference -------------------------------------------------------
+source("scripts/analyze_multimodel_inference_v11.R")
+
+
+## Determine site list ----
+source("scripts/extract_final_sitelist.R")
+
+
+
+### Path Modelling -------------------------------------------------------------
+source("scripts/analyze_path_modelling.R")
+
+```
+
+
+## Plot
+
+```{r, echo = F}
+### Choise of RaoQ -------------------------------------------------------------
+source("scripts/plot_raoq_vs_gppsat.R") # GPPsat vs RaoQ (Figure 1)
+source("scripts/plot_raoq_vs_structure.R") # RaoQ vs structure (Figure 2)
+source("scripts/plot_javiers_raoq_simulations.R") # simulated RaoQ (Figure 3)
+
+
+### Multimodel Inference -------------------------------------------------------
+## Average coefficients
+source("scripts/plot_mumin_relimp.R") # plot coeffs from  analyses based on different settings (incl. Figures 4, S2, S3, S4, S5)
+
+## R2 and AICc
+source("scripts/plot_mumin_biodiv_evaluation.R") # compare different analyses (Figure S6)
+
+
+
+### Path modelling plot --------------------------------------------------------
+# CURRENTLY SEMI-MANUAL # plot from output of path modeling (Figure 5)
+source("scripts/plot_path_modelling.R") # Figure 5
+
+
+### Maps -----------------------------------------------------------------------
+source("scripts/plot_neon_map.R") # map of used sites (Figure S1)
+
+
+### Information cards ----------------------------------------------------------
+source("scripts/plot_site_info.R")
+
+### Biodiversity exploration ---------------------------------------------------
+# source("scripts/compare_ground_satellite.R")
+source("scripts/plot_raoq_vs_biodiversity.R") # RaoQ vs biodiversity indeces
+
+
+
+```
+
+## Additional materials
+Compile supplementary tables and materials.
+
+```{r, echo = F}
+### Table of sites -------------------------------------------------------------
+source("scripts/compile_site_table.R")
+
+```
+
+## Other materials
+Run additional tests.
+
+```{r, echo = F}
+### Table of sites -------------------------------------------------------------
+source("scripts/analyze_correlations.R")
+
+```

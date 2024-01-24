@@ -1,0 +1,19 @@
+Author: Jacob A. Nelson (jnelson@bgc-jena.mpg.de)
+
+import os
+import xarray as xr
+
+base_dir = "/Net/Groups/BGI/scratch/zmhamdi/for_ulisse"
+output_dir = "/somewhere/to/put/them"
+sites = sorted(set([f.split("_")[0] for f in os.listdir(base_dir) if os.path.isfile(os.path.join(base_dir, f))]))
+
+def get_data(site):
+    atm = xr.open_mfdataset( os.path.join(base_dir, f"{site}_atm_*.nc") )
+    flx = xr.open_mfdataset( os.path.join(base_dir, f"{site}_eval_*.nc") )
+    assert (atm.time==flx.time).all()
+    ds = xr.merge([atm, flx]).isel(lat=0, lon=0)
+    return ds
+
+for site in sites:
+    ds = get_data(site).compute()
+    ds.to_netcdf( os.path.join(output_dir, f"{site}.nc") )
