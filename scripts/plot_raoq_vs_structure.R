@@ -47,7 +47,7 @@ dat_sub <- dat %>%
   select(SITE_ID, IGBP,
          Rao_Q_NIRv, Rao_Q_NDVI, NDVI_max,
          stem_diameter, height_max, max_crown_diameter, max_base_crown_diameter, LAI_max, height
-         ) %>% 
+  ) %>% 
   mutate(across(where(is.double), min_max_norm)) %>% # normalize
   glimpse()
 
@@ -125,8 +125,12 @@ plot_struct_boxplot_bins <- function(
     data = dat_plot, x, xlab = "", group
 ) {
   require(rlang)
+  require(tidyr)
+  
   x <- rlang::ensym(x)
   group <- rlang::ensym(group)
+  
+  n <- data %>% drop_na(!!x, contains("Rao_Q")) %>% nrow()
   
   p_out <- data %>%
     pivot_longer(cols = contains("Rao_Q"), names_to = "Rao_Q_names", values_to = "Rao_Q_values") %>%
@@ -152,6 +156,7 @@ plot_struct_boxplot_bins <- function(
            #group = guide_legend(title = "Structure group")
     ) +
     xlab(xlab) + ylab("Rao Q") +
+    labs(caption = glue::glue("n = {n}")) +
     theme_bw() +
     theme_combine +
     theme(axis.title.y = element_blank()) +
@@ -180,9 +185,9 @@ p_crown_classes <- dat %>%
         str_extract(unique(max_crown_diameter_class), pattern = "[:digit:]+.?[:digit:]*(?=,)"),
         "-",
         str_extract(unique(max_crown_diameter_class), pattern = "(?<=,)[:digit:]+.?[:digit:]*(?=]|\\))")
-        )
       )
-    ) %>%
+    )
+  ) %>%
   glimpse() %>% 
   plot_struct_boxplot_bins(
     x = max_crown_diameter_class, xlab = expression(paste("Crown Diameter (max) [", m, "]")), group = max_crown_diameter_class
@@ -205,9 +210,9 @@ p_lai_classes <- dat %>%
         str_extract(unique(LAI_max_class), pattern = "[:digit:]+.?[:digit:]*(?=,)"),
         "-",
         str_extract(unique(LAI_max_class), pattern = "(?<=,)[:digit:]+.?[:digit:]*(?=]|\\))")
-        )
       )
-    ) %>%
+    )
+  ) %>%
   glimpse() %>% 
   plot_struct_boxplot_bins(
     x = LAI_max_class, xlab = expression(paste("Leaf Area Index (max) [",m^{2}," ", m^{-2},"]")), group = LAI_max_class
@@ -268,9 +273,9 @@ p_stem_diameter_classes <- dat %>%
 ## Combine subplots ----
 figure2 <- (p_lai_classes + theme(legend.position = "none") |
               p_crown_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank())
-              | p_height_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank())
-              # | p_stem_diameter_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank())
-) + plot_layout(guides = 'collect') #+ plot_annotation(tag_levels = "a")
+            | p_height_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank())
+            # | p_stem_diameter_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank())
+) + plot_layout(guides = 'collect') + plot_annotation(tag_levels = "a")
 figure2
 
 
