@@ -15,6 +15,7 @@ Three_colorblind2 <- c("#B22E2D", "#1E70B8", "#8FAD02")
 Three_colors3 <- c("#73C03C", "#F15620", "#3C368C")
 
 ## 4-color palettes
+Four_colorblind <- c("#b81e23", "#1eb8b3", "#70b81e", "#661eb8") # original
 
 ## 5-color palettes
 Five_colorblind <- c("#b77508", "#e5ab16", "#1eb8b3", "#a354d1", "#6a2a99")

@@ -26,11 +26,6 @@ library(readr)      # read table format files
 # library(tictoc)     # measure time
 library(tidyr)      # clean and reshape tidy data
 
-## Functions
-source("scripts/functions/calc_CUEeco.R")
-source("scripts/functions/calc_GPPsat_NEPmax.R")
-source("scripts/functions/calc_Gsmax.R")
-
 
 
 ### Data -----------------------------------------------------------------------

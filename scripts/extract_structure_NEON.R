@@ -108,6 +108,23 @@ df_filt <- bind_rows(df_filt, df_filt_distributed) %>% arrange(siteID) # add mea
 
 
 
+### NEON structure data availability -------------------------------------------
+neon_avail <- df_filt %>% 
+  group_by(siteID) %>%
+  summarise(
+    Structure_start = min(date, na.rm = T),
+    Structure_end = max(date, na.rm = T)
+  ) %>% 
+  ungroup() %>% 
+  dplyr::rename(SITE_ID = siteID)
+
+## Save
+if (savedata) {
+  write_csv(neon_avail, "data/input/NEON/NEON_struct-plant/structure_data_availability.csv")
+}
+
+
+
 ### Aggregate and extract variables --------------------------------------------
 ## 1) Aggregate to unique measurement events for each individual ----
 tic("Event aggregation")

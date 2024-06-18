@@ -117,12 +117,8 @@ source("scripts/plot_mumin_biodiv_evaluation.R") # compare different analyses (F
 
 
 ### Path modelling plot --------------------------------------------------------
-# CURRENTLY SEMI-MANUAL # plot from output of path modeling (Figure 5)
-source("scripts/plot_path_modelling.R") # Figure 5
-
-
-### Maps -----------------------------------------------------------------------
-source("scripts/plot_neon_map.R") # map of used sites (Figure S1)
+# CURRENTLY MANUAL: # plot from output of path modeling (Figure 5)
+source("scripts/plot_path_modelling.R") # mock-ups for Figure 5
 
 
 ### Information cards ----------------------------------------------------------
@@ -140,8 +136,11 @@ source("scripts/plot_raoq_vs_biodiversity.R") # RaoQ vs biodiversity indeces
 Compile supplementary tables and materials.
 
 ```{r, echo = F}
-### Table of sites -------------------------------------------------------------
+### Table S1: Table of sites ---------------------------------------------------
 source("scripts/compile_site_table.R")
+
+### Figure S1. Map of NEON sites -----------------------------------------------
+source("scripts/plot_neon_map_and_period.R") # map of used sites (Figure S1)
 
 ```
 

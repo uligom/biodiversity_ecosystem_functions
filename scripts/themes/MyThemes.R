@@ -1,7 +1,9 @@
 source("scripts/themes/MyPlotSpecs.R")
 
 theme_combine <- theme(
+  axis.line = element_blank(), # remove axis line
   axis.text = element_text(size = text_size_medium),
+  axis.ticks = element_blank(), # remove ticks from empty axis
   axis.title = element_text(size = text_size_big),
   legend.key.size = unit(12, "mm"), # space out legend elements
   legend.text = element_text(size = text_size_medium + 3),
@@ -52,9 +54,9 @@ theme_facets <- theme(
 )
 
 theme_less_facets <- theme(
-  axis.line = element_blank(),
+  axis.line = element_blank(), # remove axis line
   axis.text = element_text(size = 24),
-    axis.ticks = element_blank(), # remove ticks from empty axis
+  axis.ticks = element_blank(), # remove ticks from empty axis
   axis.title = element_text(size = 36, face = "bold"),
   legend.text = element_text(size = 32),
   legend.title = element_text(size = 36, face = "bold"),

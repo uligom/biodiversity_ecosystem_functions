@@ -71,9 +71,11 @@ dat_icos <- map(.x = list.files(path = "data/input/ICOS/unzipped_all/", pattern 
 ## NEON species data at subplots ----
 # Set global option to NOT convert all character variables to factors
 options(stringsAsFactors = F)
-## Unzip manually downloaded data (only first time)
-# Modify the file path to match the path to your zip file
-stackByTable("data/NEON/NEON_presence-cover-plant/NEON_presence-cover-plant.zip") # un-zips in same directory and stacks sites into single tables
+
+# ## Unzip manually downloaded data (only first time)
+# # Modify the file path to match the path to your zip file
+# stackByTable("data/NEON/NEON_presence-cover-plant/NEON_presence-cover-plant.zip") # un-zips in same directory and stacks sites into single tables
+
 ## Load stacked data
 dat_neon1m <- read_csv("data/input/NEON/NEON_presence-cover-plant/stackedFiles/div_1m2Data.csv", show_col_types = F) %>% glimpse()
 dat_neon10m <- read_csv("data/input/NEON/NEON_presence-cover-plant/stackedFiles/div_10m2Data100m2Data.csv", show_col_types = F) %>% glimpse()
@@ -95,86 +97,86 @@ meta_neon <- read_csv("data/input/NEON/neon_sites.csv", show_col_types = F) %>% 
 # OTHER: double
 # SOURCE: chr (reference/DOI/PI)
 
-## ICOS ----
-# Cover should be in range 0-100 (=> convert to 0-1)
-dat_icos <- dat_icos %>% # output <- your BADM tibble
-  dplyr::filter(VARIABLE != "SITE_ID") %>% # exclude redundant site name variable
-  dplyr::filter(VARIABLE_GROUP == "GRP_SPP") %>% # filter species information; NB: SPP_U DOES NOT CONTAIN ANY SPECIES NAME
-  tidyr::pivot_wider(names_from = VARIABLE, values_from = DATAVALUE) %>% # re-structure data to tidy format, i.e. every column = one variable
-  dplyr::rename(DATE = SPP_DATE, SPECIES = SPP_O, COVER = SPP_O_PERC) %>%
-  mutate(
-    COVER = if_else(is.na(SPECIES), NA_character_, COVER), # set cover to NA where no single species is given
-    SPECIES = if_else(is.na(SPECIES), # extract species names from comments => only true for DE-Gri
-                      str_extract_all(SPP_COMMENT,
-                                      "[:upper:]{1}[:lower:]+ [:lower:]+"),
-                      SPECIES %>% as.list())
-  ) %>% 
-  unnest(cols = SPECIES) %>% 
-  mutate(
-    SPECIES = if_else(is.na(SPECIES), # extract species names from vegetation type => only true for DE-Gri
-                      SPP_O_VEGTYPE,
-                      SPECIES),
-    DATE = if_else(condition = DATE %>% as.double() < 9999, # correct 'only-year' entries
-                   true = paste0(DATE, "0101"),
-                   false = DATE
-    ),
-    DATE = if_else(condition = DATE %>% as.double() > 99999999, # correct 'incl. hour' entries
-                   true = str_sub(DATE, start = 1, end = 8),
-                   false = DATE
-    ),
-    DATE = DATE %>% lubridate::ymd(),
-    DATE = if_else(is.na(DATE), SPP_DATE_END %>% lubridate::ymd(), DATE), # gap-fill with end-of-measurement date
-    DATE = if_else(is.na(DATE),
-                   SPP_O_PERC_DATE_END %>% str_sub(1, 8) %>% lubridate::ymd(),
-                   DATE), # gap-fill with end-of-cover-measurement date
-    PRESENCE = if_else(!is.na(SPECIES), T, F),
-    COVER = COVER %>% as.double(),
-    SOURCE = "ICOS BIF"
-  ) %>% 
-  dplyr::mutate(SPECIES = str_extract(SPECIES, "[:upper:]{1}[:lower:]+[:blank:]*[:lower:]*")) %>% 
-  dplyr::filter(SPECIES != "Poaceae") %>% # manually exclude DE-Gri entry (redundant to extracted species names from comments)
-  # group_by(SITE_ID) %>% # for counting entries per group
-  # mutate(n_entries = n(),
-  #        COVER = if_else(SITE_ID == "DE-Gri", 100/n_entries, COVER)) %>% # doesn't make sense to make assumption on homogeneous cover
-  # ungroup() %>% 
-  # dplyr::select(-n_entries) %>% 
-  dplyr::filter((COVER != Inf & COVER != 0) | is.na(COVER)) %>% # remove infinite and zero values
-  dplyr::filter(SPP_O_PERC_STATISTIC == "Mean") %>% # filter only mean values
-  dplyr::select(SITE_ID, SPECIES, DATE, PRESENCE, COVER, SOURCE) %>%
-  dplyr::mutate(EVENT_ID = paste(SITE_ID, DATE, sep = "_"), .after = SITE_ID) %>% # add EVENT_ID
-  unique() %>%
-  glimpse()
-
-
-## Pre-process ICOS ----
-# Correct wrong entries (manual):
-# DE-Hai: from 7 to 65%                                       => /100
-# DE-Kli: 100% Triticum aestivum (rotation cropland?)         => /100
-# FI-Var: 100% Pinus sylvestris                               => /100
-# IT-Lsn: 30% Vitis vinifera x 2?? 73% U and 27% overstory??  => /100
-# IT-Tor: from 0.5% to 34%                                    => /100
-# SE-Deg: from 0.0005% to 52% ???                             => /100
-
-dat_icos <- dat_icos %>% 
-  mutate( # correct wrong entries
-    COVER = if_else(SITE_ID %in% c("DE-Hai", "DE-Kli", "FI-Var", "IT-Lsn", "IT-Tor", "SE-Deg"),
-                    COVER / 100,
-                    COVER)
-  ) %>% 
-  group_by(SITE_ID, EVENT_ID, SPECIES) %>% 
-  add_count() %>% 
-  mutate(
-    SPECIES = if_else( # "save" duplicates with different cover (2 Empetrum nigrum at SE-Deg site) by adding a unique ID to the species name
-      condition = n == 1,
-      true = SPECIES,
-      false = paste0(SPECIES, row_number())
-    )
-  ) %>% 
-  ungroup() %>% 
-  select(-n) %>% 
-  glimpse()
-
-
+# ## ICOS ----
+# # Cover should be in range 0-100 (=> convert to 0-1)
+# dat_icos <- dat_icos %>% # output <- your BADM tibble
+#   dplyr::filter(VARIABLE != "SITE_ID") %>% # exclude redundant site name variable
+#   dplyr::filter(VARIABLE_GROUP == "GRP_SPP") %>% # filter species information; NB: SPP_U DOES NOT CONTAIN ANY SPECIES NAME
+#   tidyr::pivot_wider(names_from = VARIABLE, values_from = DATAVALUE) %>% # re-structure data to tidy format, i.e. every column = one variable
+#   dplyr::rename(DATE = SPP_DATE, SPECIES = SPP_O, COVER = SPP_O_PERC) %>%
+#   mutate(
+#     COVER = if_else(is.na(SPECIES), NA_character_, COVER), # set cover to NA where no single species is given
+#     SPECIES = if_else(is.na(SPECIES), # extract species names from comments => only true for DE-Gri
+#                       str_extract_all(SPP_COMMENT,
+#                                       "[:upper:]{1}[:lower:]+ [:lower:]+"),
+#                       SPECIES %>% as.list())
+#   ) %>% 
+#   unnest(cols = SPECIES) %>% 
+#   mutate(
+#     SPECIES = if_else(is.na(SPECIES), # extract species names from vegetation type => only true for DE-Gri
+#                       SPP_O_VEGTYPE,
+#                       SPECIES),
+#     DATE = if_else(condition = DATE %>% as.double() < 9999, # correct 'only-year' entries
+#                    true = paste0(DATE, "0101"),
+#                    false = DATE
+#     ),
+#     DATE = if_else(condition = DATE %>% as.double() > 99999999, # correct 'incl. hour' entries
+#                    true = str_sub(DATE, start = 1, end = 8),
+#                    false = DATE
+#     ),
+#     DATE = DATE %>% lubridate::ymd(),
+#     DATE = if_else(is.na(DATE), SPP_DATE_END %>% lubridate::ymd(), DATE), # gap-fill with end-of-measurement date
+#     DATE = if_else(is.na(DATE),
+#                    SPP_O_PERC_DATE_END %>% str_sub(1, 8) %>% lubridate::ymd(),
+#                    DATE), # gap-fill with end-of-cover-measurement date
+#     PRESENCE = if_else(!is.na(SPECIES), T, F),
+#     COVER = COVER %>% as.double(),
+#     SOURCE = "ICOS BIF"
+#   ) %>% 
+#   dplyr::mutate(SPECIES = str_extract(SPECIES, "[:upper:]{1}[:lower:]+[:blank:]*[:lower:]*")) %>% 
+#   dplyr::filter(SPECIES != "Poaceae") %>% # manually exclude DE-Gri entry (redundant to extracted species names from comments)
+#   # group_by(SITE_ID) %>% # for counting entries per group
+#   # mutate(n_entries = n(),
+#   #        COVER = if_else(SITE_ID == "DE-Gri", 100/n_entries, COVER)) %>% # doesn't make sense to make assumption on homogeneous cover
+#   # ungroup() %>% 
+#   # dplyr::select(-n_entries) %>% 
+#   dplyr::filter((COVER != Inf & COVER != 0) | is.na(COVER)) %>% # remove infinite and zero values
+#   dplyr::filter(SPP_O_PERC_STATISTIC == "Mean") %>% # filter only mean values
+#   dplyr::select(SITE_ID, SPECIES, DATE, PRESENCE, COVER, SOURCE) %>%
+#   dplyr::mutate(EVENT_ID = paste(SITE_ID, DATE, sep = "_"), .after = SITE_ID) %>% # add EVENT_ID
+#   unique() %>%
+#   glimpse()
+# 
+# 
+# ## Pre-process ICOS ----
+# # Correct wrong entries (manual):
+# # DE-Hai: from 7 to 65%                                       => /100
+# # DE-Kli: 100% Triticum aestivum (rotation cropland?)         => /100
+# # FI-Var: 100% Pinus sylvestris                               => /100
+# # IT-Lsn: 30% Vitis vinifera x 2?? 73% U and 27% overstory??  => /100
+# # IT-Tor: from 0.5% to 34%                                    => /100
+# # SE-Deg: from 0.0005% to 52% ???                             => /100
+# 
+# dat_icos <- dat_icos %>% 
+#   mutate( # correct wrong entries
+#     COVER = if_else(SITE_ID %in% c("DE-Hai", "DE-Kli", "FI-Var", "IT-Lsn", "IT-Tor", "SE-Deg"),
+#                     COVER / 100,
+#                     COVER)
+#   ) %>% 
+#   group_by(SITE_ID, EVENT_ID, SPECIES) %>% 
+#   add_count() %>% 
+#   mutate(
+#     SPECIES = if_else( # "save" duplicates with different cover (2 Empetrum nigrum at SE-Deg site) by adding a unique ID to the species name
+#       condition = n == 1,
+#       true = SPECIES,
+#       false = paste0(SPECIES, row_number())
+#     )
+#   ) %>% 
+#   ungroup() %>% 
+#   select(-n) %>% 
+#   glimpse()
+# 
+# 
 
 ## NEON: merge 1m2 + 10m2 + 100m2 ----
 dat_neon_merged <- dat_neon1m %>% 
@@ -236,6 +238,20 @@ dat_neon <- dat_neon_filt %>%
   dplyr::select(SITE_ID, PLOT_ID, SUBPLOT_ID, EVENT_ID, DATE, SPECIES, PRESENCE, COVER, SOURCE) %>%
   glimpse()
 
+
+## NEON species data availability ----
+neon_avail <- dat_neon %>% 
+  group_by(SITE_ID) %>%
+  summarise(
+    Spp_start = min(DATE, na.rm = T),
+    Spp_end = max(DATE, na.rm = T)
+  ) %>% 
+  ungroup()
+
+## Save
+if (savedata) {
+  write_csv(neon_avail, "data/input/NEON/NEON_presence-cover-plant/species_data_availability.csv")
+}
 
 
 ### Combine data ---------------------------------------------------------------

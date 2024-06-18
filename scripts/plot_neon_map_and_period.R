@@ -132,7 +132,7 @@ dat_plot <- dat_all %>%
     by = c("SITE_ID", "IGBP", "latitude", "longitude", "Dataset")
   ) %>% 
   mutate(Dataset = case_when( # rename
-    Dataset == "Flux" ~ "NEON Flux data",
+    Dataset == "Flux" ~ "NEON Flux/Meteo data",
     Dataset == "S2" ~ "Sentinel 2 scenes",
     Dataset == "Spp" ~ "NEON Species data",
     Dataset == "Structure" ~ "NEON Structure data"
@@ -144,7 +144,7 @@ dat_plot <- dat_all %>%
 line_thickness <- 2.6
 
 p_avail <- ggplot() +
-  geom_linerange(data = dplyr::filter(dat_plot, Dataset == "NEON Flux data"),
+  geom_linerange(data = dplyr::filter(dat_plot, Dataset == "NEON Flux/Meteo data"),
                  aes(xmin = start_date, xmax = end_date, y = SITE_ID, group = Dataset, color = Dataset),
                  linewidth = line_thickness, na.rm = T) +
   geom_linerange(data = dplyr::filter(dat_plot, Dataset == "Sentinel 2 scenes"),
@@ -160,54 +160,54 @@ p_avail <- ggplot() +
                  position = position_nudge(y = 0.6),
                  linewidth = line_thickness, na.rm = T) +
   scale_color_manual(values = c(
-    `NEON Flux data` = "#2DB1B2", `Sentinel 2 scenes` = "#B22E2D", `NEON Species data` = "#dfa8a7", `NEON Structure data` = "#8FAD02"),
-    guide = guide_legend(title = "Dataset:", title.position = "top")
+    `NEON Flux/Meteo data` = "#2DB1B2", `Sentinel 2 scenes` = "#B22E2D", `NEON Species data` = "#dfa8a7", `NEON Structure data` = "#8FAD02"),
+    guide = guide_legend(title = "Dataset:", nrow = 2)#title.position = "top")
   ) +
   scale_y_discrete(expand = expansion(add = c(0.5, 1))) + # add space on top and bottom of grid
   theme_bw() +
   theme_combine +
   theme(
     axis.title = element_blank(),
-    # legend.direction = "horizontal",
-    # legend.position = "bottom"
+    legend.direction = "horizontal",
+    legend.position = "bottom"
     )
 p_avail
 
 
 
-### Combine plots --------------------------------------------------------------
-figureS1 <- (
-  (
-    ((p_avail & theme(legend.direction = "horizontal")) / guide_area()) +
-      plot_layout(heights = c(0.95, 0.05), guides = "collect")
-  ) |
-    (p_map / guide_area() / plot_spacer()) +
-      plot_layout(heights = c(0.4, 0.4, 0.2), guides = "collect")
-  ) +
-  plot_layout(widths = c(0.6, 0.4)) +
-  plot_annotation(tag_levels = "a")
-figureS1
-
-
+# ### Combine plots --------------------------------------------------------------
+# figureS1 <- (
+#   (
+#     ((p_avail & theme(legend.direction = "horizontal")) / guide_area()) +
+#       plot_layout(heights = c(0.95, 0.05), guides = "collect")
+#   ) |
+#     (p_map / guide_area() / plot_spacer()) +
+#       plot_layout(heights = c(0.4, 0.4, 0.2), guides = "collect")
+#   ) +
+#   plot_layout(widths = c(0.6, 0.4)) +
+#   plot_annotation(tag_levels = "a")
+# figureS1
+# 
+# 
 
 ### Save -----------------------------------------------------------------------
 if (savedata) {
   if (!is.null(colorvar)) {colorvar <- paste0("_", ensym(colorvar))} else {colorvar = ""}
-  ## map (jpg)
-  ggplot2::ggsave(filename = glue::glue("results/SITES/site_map{colorvar}_{vers_out}.jpg"),
+  ## Figure S1: map (jpg)
+  ggplot2::ggsave(filename = glue::glue("results/SITES/figureS1_site_map{colorvar}_{vers_out}.jpg"),
                   plot = p_map, device = "jpeg",
                   width = 508, height = 285.75, units = "mm", dpi = 150)
   # # transparent png
   # ggplot2::ggsave(filename = glue::glue("results/SITES/site_map_{ensym(colorvar)}_{vers_out}.png"), plot = p_map, device = "png",
   #                 bg = "transparent", width = 508, height = 285.75, units = "mm", dpi = 300)
   
-  ## Plot of data availability
-  ggsave(filename = glue::glue("results/SITES/data_availability_{vers_out}.jpg"),
+  ## Figure S2: data availability
+  ggsave(filename = glue::glue("results/SITES/figureS2_data_availability_{vers_out}.jpg"),
          plot = p_avail, device = "jpeg",
-         width = 300, height = 400, units = "mm", dpi = 150) # 3:4 ratio
+         width = 360, height = 480, units = "mm", dpi = 150) # 3:4 ratio
   
-  ## Figure S1
-  ggsave(filename = glue::glue("results/SITES/figureS1_data_availability_{vers_out}.jpg"),
-         plot = figureS1, device = "jpeg",
-         width = 600, height = 450, units = "mm", dpi = 300) # 4:3 ratio
+  # ## Figure S1
+  # ggsave(filename = glue::glue("results/SITES/figureS1_data_availability_{vers_out}.jpg"),
+  #        plot = figureS1, device = "jpeg",
+  #        width = 600, height = 450, units = "mm", dpi = 300) # 4:3 ratio
 }

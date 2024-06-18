@@ -81,6 +81,7 @@ calc_WUEt <- function(data, site, year,
       output <- dat_filt %>% 
         dplyr::mutate(T_sum = sum(TEA_T_NT_75, na.rm = T), # sum of T for reference and to avoid dividing by 0
                       WUEt = if_else(T_sum != 0, sum(GPP, na.rm = T) / sum(TEA_T_NT_75, na.rm = T), NA_real_) # calculate cumulative WUEt while avoiding dividing by 0 when no T data is available for the site # WUEt around peak of APAR
+                      # i.e. ratio of sums; equivalent to ratio of means, while mean of ratios results in a biased aggregated metric.
         ) %>%
         dplyr::summarise(WUEt = unique(WUEt), # cumulative WUEt
                          WUEet = mean(GPP/ET), # ET-based WUE for reference
