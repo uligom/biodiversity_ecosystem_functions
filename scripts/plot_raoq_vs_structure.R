@@ -284,6 +284,8 @@ p_stem_diameter_classes <- dat %>%
 
 
 ## NDVI max ----
+cor.test(dat$Rao_Q_NDVI, dat$NDVI_max, method = "spearman")
+
 p_ndvimax_classes <- dat %>%
   select(SITE_ID, IGBP,
          Rao_Q_NIRv, Rao_Q_NDVI,
@@ -314,33 +316,35 @@ p_ndvimax_classes <- dat %>%
 
 
 ## NIRv max ----
-p_nirv_classes <- dat %>%
-  select(SITE_ID, IGBP,
-         Rao_Q_NIRv, Rao_Q_NDVI,
-         NIRv_max # ==> significant structural predictors of RaoQ in linear models
-  ) %>%
-  drop_na() %>%
-  # mutate(across(where(is.double), min_max_norm)) %>% # normalize
-  arrange(NIRv_max) %>%
-  mutate( # discretize structure into equal-sized classes
-    NIRv_max_class = cut_number(NIRv_max, 4),
-    NIRv_max_class = factor(
-      NIRv_max_class,
-      levels = unique(NIRv_max_class),
-      labels = paste0(
-        str_extract(unique(NIRv_max_class), pattern = "[:digit:]+.?[:digit:]*(?=,)") %>% 
-          as.double() %>% round(digits = small_digits) %>% format(nsmall = small_digits),
-        " - ",
-        str_extract(unique(NIRv_max_class), pattern = "(?<=,)[:digit:]+.?[:digit:]*(?=]|\\))") %>% 
-          as.double() %>% round(digits = small_digits) %>% format(nsmall = small_digits)
-      )
-    )
-  ) %>%
-  glimpse() %>% 
-  plot_struct_boxplot_bins(
-    x = NIRv_max_class, xlab = expression(paste("NIRv (max) [-]")), group = NIRv_max_class
-  )
+cor.test(dat$Rao_Q_NIRv, dat$NDVI_max, method = "spearman")
 
+# p_nirv_classes <- dat %>%
+#   select(SITE_ID, IGBP,
+#          Rao_Q_NIRv, Rao_Q_NDVI,
+#          NIRv_max # ==> significant structural predictors of RaoQ in linear models
+#   ) %>%
+#   drop_na() %>%
+#   # mutate(across(where(is.double), min_max_norm)) %>% # normalize
+#   arrange(NIRv_max) %>%
+#   mutate( # discretize structure into equal-sized classes
+#     NIRv_max_class = cut_number(NIRv_max, 4),
+#     NIRv_max_class = factor(
+#       NIRv_max_class,
+#       levels = unique(NIRv_max_class),
+#       labels = paste0(
+#         str_extract(unique(NIRv_max_class), pattern = "[:digit:]+.?[:digit:]*(?=,)") %>% 
+#           as.double() %>% round(digits = small_digits) %>% format(nsmall = small_digits),
+#         " - ",
+#         str_extract(unique(NIRv_max_class), pattern = "(?<=,)[:digit:]+.?[:digit:]*(?=]|\\))") %>% 
+#           as.double() %>% round(digits = small_digits) %>% format(nsmall = small_digits)
+#       )
+#     )
+#   ) %>%
+#   glimpse() %>% 
+#   plot_struct_boxplot_bins(
+#     x = NIRv_max_class, xlab = expression(paste("NIRv (max) [-]")), group = NIRv_max_class
+#   )
+# 
 
 ## Combine subplots ----
 figure2 <- (p_lai_classes + theme(legend.position = "none") |
@@ -353,9 +357,9 @@ figure2
 figure2plus <- (p_lai_classes + theme(legend.position = "none") |
     p_crown_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank(), legend.position = "none")
   | p_height_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank(), legend.position = "none")
-  | p_ndvimax_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank(), legend.position = "none")
-  | p_nirv_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank(), legend.direction = "horizontal") +
-    guides(fill = guide_legend(title = "IGBP class:", nrow = 1))
+  | p_ndvimax_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank(), legend.direction = "horizontal")
+  # | p_nirv_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank(), legend.direction = "horizontal")
+  + guides(fill = guide_legend(title = "IGBP class:", nrow = 1))
   # | p_stem_diameter_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank())
 ) / (
   guide_area()
@@ -386,6 +390,6 @@ if (savedata) {
   
   ggsave(filename = glue::glue("results/scatterplots/figure2plus_RaoQ_structure_boxplot_categories_{vers_out}.jpg"),
          plot = figure2plus, device = "jpeg",
-         width = 750, height = 340.91, units = "mm", dpi = 300) # 11:5 ratio
+         width = 600, height = 272.73, units = "mm", dpi = 300) # 11:5 ratio
   
 }
