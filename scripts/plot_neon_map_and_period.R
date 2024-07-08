@@ -74,9 +74,9 @@ s2_period <- dat_s2 %>%
 dat_all <- sites %>% 
   left_join(igbp, by = "SITE_ID") %>%
   left_join(coords, by = "SITE_ID") %>%
-  left_join(flux_period, by = "SITE_ID")  %>%
-  left_join(s2_period, by = "SITE_ID")  %>%
-  left_join(dat_spp, by = "SITE_ID")  %>%
+  left_join(flux_period, by = "SITE_ID") %>%
+  left_join(s2_period, by = "SITE_ID") %>%
+  left_join(dat_spp, by = "SITE_ID") %>%
   left_join(dat_str, by = "SITE_ID") %>% 
   glimpse()
 
@@ -133,7 +133,7 @@ dat_plot <- dat_all %>%
   ) %>% 
   mutate(Dataset = case_when( # rename
     Dataset == "Flux" ~ "NEON Flux/Meteo data",
-    Dataset == "S2" ~ "Sentinel 2 scenes",
+    Dataset == "S2" ~ "Valid Sentinel-2 scenes",
     Dataset == "Spp" ~ "NEON Species data",
     Dataset == "Structure" ~ "NEON Structure data"
     )
@@ -147,7 +147,7 @@ p_avail <- ggplot() +
   geom_linerange(data = dplyr::filter(dat_plot, Dataset == "NEON Flux/Meteo data"),
                  aes(xmin = start_date, xmax = end_date, y = SITE_ID, group = Dataset, color = Dataset),
                  linewidth = line_thickness, na.rm = T) +
-  geom_linerange(data = dplyr::filter(dat_plot, Dataset == "Sentinel 2 scenes"),
+  geom_linerange(data = dplyr::filter(dat_plot, Dataset == "Valid Sentinel-2 scenes"),
                  aes(xmin = start_date, xmax = end_date, y = SITE_ID, group = Dataset, color = Dataset),
                  position = position_nudge(y = 0.2),
                  linewidth = line_thickness, na.rm = T) +
@@ -160,7 +160,7 @@ p_avail <- ggplot() +
                  position = position_nudge(y = 0.6),
                  linewidth = line_thickness, na.rm = T) +
   scale_color_manual(values = c(
-    `NEON Flux/Meteo data` = "#2DB1B2", `Sentinel 2 scenes` = "#B22E2D", `NEON Species data` = "#dfa8a7", `NEON Structure data` = "#8FAD02"),
+    `NEON Flux/Meteo data` = "#2DB1B2", `Valid Sentinel-2 scenes` = "#B22E2D", `NEON Species data` = "#dfa8a7", `NEON Structure data` = "#8FAD02"),
     guide = guide_legend(title = "Dataset:", nrow = 2)#title.position = "top")
   ) +
   scale_y_discrete(expand = expansion(add = c(0.5, 1))) + # add space on top and bottom of grid
