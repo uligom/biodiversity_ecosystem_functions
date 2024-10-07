@@ -47,7 +47,8 @@ for (bbb in 1:3) {
   # "nirv" = raoQ from NIRv
   
   vers_in <- glue::glue("{scale_vers}_{raoq_in}_{vers}")
-  vers_out <- paste0(vers_in)
+  # vers_in <- "main_nirv_raoq+nirvmax+ndvimax_v11.06.06"
+  vers_out <- paste0(vers_in, "_rev2") # updated to second ERE review
   
   
   
@@ -87,8 +88,12 @@ for (bbb in 1:3) {
   
   ### Plot ---------------------------------------------------------------------
   ## Labels and options ----
-  ## Add color labels
-  Three_colorblind <- setNames(Three_colorblind2, c("Biodiversity", "Climate", "Structure"))
+  ## color labels
+  accessible_palette <- setNames(Three_colorblind2, c("Biodiversity", "Climate", "Structure"))
+  
+  # plot specifications
+  line_width <- line_width_thick
+  point_size <- point_size_medium
   
   ## Add predictor labels
   dat <- dat %>% 
@@ -128,45 +133,133 @@ for (bbb in 1:3) {
       var_type = factor(
         var_type,
         levels = c("Biodiversity", "Climate", "Structure")
+        ),
+      rel_cat = case_when( # add relative importance categories
+        rel_importance >= 0.0 & rel_importance < 0.1 ~ 0.00,
+        rel_importance >= 0.1 & rel_importance < 0.2 ~ 0.25,
+        rel_importance >= 0.2 & rel_importance < 0.3 ~ 0.50,
+        rel_importance >= 0.3 & rel_importance < 0.4 ~ 0.75,
+        rel_importance >= 0.4 & rel_importance < 1.0 ~ 1.00
+      ) %>% factor(
+        levels = c(0.00, 0.25, 0.50, 0.75, 1.00),
+        labels = c("  0% -  10%", "10% -  20%", "20% -  30%", "30% -  40%", "40% - 100%")
         )
       ) %>%
     arrange(prediction, var_type, variable) %>% 
     glimpse()
   
+  # x limits
+  x_lim <- max(abs(dat %>% mutate(val_std = if_else(estimate > 0, true = estimate + std_error, false = estimate - std_error)) %>% pull(val_std)), na.rm = T) * 1.1 # identify max coefficient across analyses and round, with a buffer
+  
+  
   
   ## Plot model coefficients ----
   p_effects <- list() # initialize list of plots
   for (pp in 1:length(unique(dat$prediction))) {
+    # data
     dat_pp <- dat %>% dplyr::filter(prediction == unique(dat$prediction)[pp])
+    
+    # caption (pp)
+    if (scale_vers == "main") {
+      labelcap <- bquote(R^2 ~ "=" ~ .(sprintf("%.1f", signif(unique(dat_pp$R2), 3) * 100)) ~ "%" ~
+                           "  RMSE =" ~ .(sprintf("%.1f", signif(unique(dat_pp$RMSE), 2))) ~
+                           "  n =" ~ .(unique(dat_pp$n))
+      )
+    } else {
+      labelcap <- bquote(R^2 ~ "=" ~ .(sprintf("%.1f", signif(unique(dat_pp$R2), 3) * 100)) ~ "%" ~
+                           "  n =" ~ .(unique(dat_pp$n))
+      )
+    }
+    
+    # # previous to ERE review 2:
+    # p_effects[[pp]] <- dat_pp %>% 
+    #   ggplot(aes(x = estimate, y = variable, alpha = rel_importance, color = var_type)) +
+    #   geom_vline(xintercept = 0, color = text_color_background) + # 0 line
+    #   geom_pointrange(aes(xmin = estimate - std_error, xmax = estimate + std_error, alpha = rel_importance),
+    #                   size = point_size_medium, shape = 19, linewidth = line_width_thick, fatten = 1, na.rm = T) +
+    #   # geom_errorbarh(aes(xmin = estimate - std_error, xmax = estimate + std_error, alpha = rel_importance),
+    #   #                height = 0, linewidth = line_width_thick, na.rm = T) +
+    #   # geom_point(size = point_size_big, shape = 19, na.rm = T, show.legend = T) +
+    #   scale_alpha_continuous(breaks = c(0.25, 0.50, 0.75), labels = c("25 %", "50 %", "75 %"),
+    #                          limits = c(0.24, 0.76), range = c(0.33, 1), oob = squish) + #, labels = c("less important", "more important")
+    #   scale_color_manual(values = Three_colorblind, na.translate = F) + # custom colors
+    #   xlim(c(-0.25, 0.25)) +
+    #   labs(title = y_labels[pp],
+    #        caption = paste0("n = ", n_obs[pp])) +
+    #   guides(alpha = guide_legend(title = "Relative importance", override.aes = list(size = 1.5)),
+    #          color = guide_legend(title = "Predictor type", override.aes = list(size = 1.5))) + # legend titles
+    #   theme_bw() +
+    #   theme_combine +
+    #   theme(axis.title = element_blank()) +
+    #   NULL
+    
+    # updated plot
     p_effects[[pp]] <- dat_pp %>% 
-      ggplot(aes(x = estimate, y = variable, alpha = rel_importance, color = var_type)) +
+      ggplot(aes(x = estimate, y = variable)) +
       geom_vline(xintercept = 0, color = text_color_background) + # 0 line
-      geom_pointrange(aes(xmin = estimate - std_error, xmax = estimate + std_error, alpha = rel_importance),
-                      size = point_size_medium, shape = 19, linewidth = line_width_thick, fatten = 1, na.rm = T) +
-      # geom_errorbarh(aes(xmin = estimate - std_error, xmax = estimate + std_error, alpha = rel_importance),
-      #                height = 0, linewidth = line_width_thick, na.rm = T) +
-      # geom_point(size = point_size_big, shape = 19, na.rm = T, show.legend = T) +
-      scale_alpha_continuous(breaks = c(0.25, 0.50, 0.75), labels = c("25 %", "50 %", "75 %"),
-                             limits = c(0.24, 0.76), range = c(0.33, 1), oob = squish) + #, labels = c("less important", "more important")
-      scale_color_manual(values = Three_colorblind, na.translate = F) + # custom colors
-      xlim(c(-0.25, 0.25)) +
-      labs(title = y_labels[pp],
-           caption = paste0("n = ", n_obs[pp])) +
-      guides(alpha = guide_legend(title = "Relative importance", override.aes = list(size = 1.5)),
-             color = guide_legend(title = "Predictor type", override.aes = list(size = 1.5))) + # legend titles
+      geom_errorbarh( # draw errorbars without transparency
+        aes(color = var_type, xmin = estimate - std_error, xmax = estimate + std_error),
+        alpha = 1, height = 0, linewidth = line_width, na.rm = T, show.legend = T
+      ) +
+      geom_point( # add white fill, full-color stroke points to cover errorbars in the central region
+        aes(color = var_type),
+        alpha = 1, fill = "white",
+        stroke = line_width, size = point_size, shape = 21, na.rm = T, show.legend = T
+      ) +
+      geom_point( # draw round filled shape with transparency
+        aes(alpha = rel_cat, color = var_type),
+        size = point_size, shape = 19, na.rm = T, show.legend = T
+      ) +
+      geom_text( # add significance asterisks
+        aes(color = var_type, label = ifelse(p_val < 0.05, "*", NA)),
+        nudge_x = x_lim * 0.1, nudge_y = 0.1,
+        size = point_size * 1.5, na.rm = T, show.legend = F
+      ) +
+      scale_alpha_discrete(
+        range = c(0, 1), # display transparency range
+        # limits = c(0.04, 0.56), oob = squish # replaces out of bounds values with the nearest limit
+        drop = F
+      ) +
+      scale_discrete_manual( # custom colors
+        aesthetics = "color",
+        values = accessible_palette,
+        na.translate = F
+      ) +
+      scale_x_continuous(
+        breaks = waiver(),
+        limits = c(-x_lim, x_lim), # define same x axis limits for all subplots
+        n.breaks = 5 # "algorithm may choose a slightly different number to ensure nice break labels" <-- do what you want then #!*@$!!
+      ) +
+      labs(
+        title = y_labels[pp],
+        caption = labelcap
+      ) +
+      guides(
+        alpha = guide_legend(title = "Relative importance", override.aes = list(size = point_size)),
+        color = guide_legend(title = "Predictor type", override.aes = list(size = point_size))
+      ) + # legend titles
       theme_bw() +
       theme_combine +
-      theme(axis.title = element_blank()) +
+      theme(
+        axis.title = element_blank(), # remove axes titles
+        legend.background = element_rect(fill = "transparent"),
+        plot.caption = element_text(color = text_color_background), # color of caption label
+        plot.margin = unit(c(0, 10, 0, 0), "mm")
+      ) +
       NULL
+    
     if (pp != length(unique(dat$prediction))) {
       p_effects[[pp]] <- p_effects[[pp]] + theme(legend.position = "none")
+    }
+    if (pp <= length(unique(dat$prediction)) / 2) {
+      p_effects[[pp]] <- p_effects[[pp]] + theme(plot.margin = unit(c(0, 10, 5, 0), "mm")) # add spacing between first and second row when combining subplots
     }
   }
   
   
   ## Combine ----
   p_effects <- wrap_plots(p_effects, nrow = 2) +
-    plot_layout(guides = 'collect') # + plot_annotation(tag_levels = "a")
+    plot_layout(guides = 'collect') #+ plot_annotation(tag_levels = "a")
   
   
   
@@ -175,8 +268,6 @@ for (bbb in 1:3) {
     scal <- 1
     width <- 508
     height <- 285.75 #width * 6.66 / 31.02
-    # height = 508
-    # width = height * 2 * 6.66 / 31.02
     
     # multimodel effects plot
     ggplot2::ggsave(filename = glue::glue("results/multimodel_inference/mumin_coefficients_{vers_out}.jpg"), plot = p_effects, device = "jpeg",

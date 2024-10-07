@@ -1,5 +1,6 @@
 [![DOI](https://zenodo.org/badge/747640054.svg)](https://zenodo.org/doi/10.5281/zenodo.10561533)
 
+Code and input data to reproduce the analysis described in the manuscript: "Satellite remote sensing reveals the footprint of biodiversity on multiple ecosystem functions across the NEON eddy covariance network" by Gomarasca et al., in review at Environmental Research: Ecology.
 
 All analyses are described in meta_script.Rmd, including a listing of all scripts necessary to reproduce the results.
 The data folder is included and should be unzipped from the data_UNZIPME.zip file. Individual README.txt files in the data folders link to the original

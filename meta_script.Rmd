@@ -101,24 +101,24 @@ source("scripts/analyze_path_modelling.R")
 ## Plot
 
 ```{r, echo = F}
-### Choise of RaoQ -------------------------------------------------------------
-source("scripts/plot_raoq_vs_gppsat.R") # GPPsat vs RaoQ (Figure 1)
-source("scripts/plot_raoq_vs_structure.R") # RaoQ vs structure (Figure 2)
-source("scripts/plot_javiers_raoq_simulations.R") # simulated RaoQ (Figure 3)
+### Figures 2, 3, 4: Choise of RaoQ --------------------------------------------
+source("scripts/plot_raoq_vs_gppsat.R") # GPPsat vs RaoQ (Figure 2)
+source("scripts/plot_raoq_vs_structure.R") # RaoQ vs structure (Figure 3)
+source("scripts/plot_javiers_raoq_simulations.R") # simulated RaoQ (Figure 4)
 
 
-### Multimodel Inference -------------------------------------------------------
+### Figures 5, S3, S4, S5, S6, S8: Multimodel Inference ------------------------
 ## Average coefficients
-source("scripts/plot_mumin_relimp.R") # plot coeffs from  analyses based on different settings (incl. Figures 4, S2, S3, S4, S5)
+source("scripts/plot_mumin_relimp.R") # plot coeffs from  analyses based on different settings (incl. Figures 5, S3, S4, S5, S6)
 
-## R2 and AICc
-source("scripts/plot_mumin_biodiv_evaluation.R") # compare different analyses (Figure S6)
+## Figure S8: R2 and AICc
+source("scripts/plot_mumin_biodiv_evaluation.R") # compare different analyses (Figure S8)
 
 
 
-### Path modelling plot --------------------------------------------------------
-# CURRENTLY MANUAL: # plot from output of path modeling (Figure 5)
-source("scripts/plot_path_modelling.R") # mock-ups for Figure 5
+### Figure S7: Path modelling plot ---------------------------------------------
+# CURRENTLY MANUAL on Biorender: # plot from output of path modeling (Figure S7)
+source("scripts/plot_path_modelling.R") # mock-ups for Figure S7
 
 
 ### Information cards ----------------------------------------------------------
@@ -148,7 +148,7 @@ source("scripts/plot_neon_map_and_period.R") # map of used sites (Figure S1)
 Run additional tests.
 
 ```{r, echo = F}
-### Table of sites -------------------------------------------------------------
+### Test correlations ----------------------------------------------------------
 source("scripts/analyze_correlations.R")
 
 ```

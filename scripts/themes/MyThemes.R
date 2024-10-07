@@ -19,7 +19,7 @@ theme_print <- theme(
   axis.line = element_blank(),
   axis.text = element_text(size = 24),
   axis.ticks = element_blank(), # remove ticks from empty axis
-  axis.title = element_text(size = 32, face = "bold"),
+  axis.title = element_text(size = 32),
   legend.text = element_text(size = 24),
   legend.title = element_text(size = 32, face = "bold"),
   # legend.position = c(0.8, 0.1),

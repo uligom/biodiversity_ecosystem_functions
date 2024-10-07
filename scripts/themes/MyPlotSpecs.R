@@ -8,6 +8,7 @@ point_size_medium_small <- 4.5
 point_size_small <- 3
 
 ## Transparency
+alpha_very_transparent <- 0.05
 alpha_transparent <- 0.5
 alpha_medium <- 0.7
 alpha_opaque <- 0.9
@@ -20,6 +21,7 @@ text_size_small <- 14
 
 ## Lines/strokes
 line_color_plot <- "gray25"
+line_width_extracthick <- 2
 line_width_thick <- 1.5
 line_width_medium <- 1
 line_width_thin <- 0.7

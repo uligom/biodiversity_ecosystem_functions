@@ -10,7 +10,7 @@ rm(list = ls(all = T))
 ### Options --------------------------------------------------------------------
 # Data settings
 savedata <- T #as.logical(readline(prompt = "Save the output of the script? T/F:")) # ask if output should be saved
-vers_out <- "v02"
+vers_out <- "v03"
 
 
 
@@ -37,7 +37,7 @@ source("scripts/themes/MyPlotSpecs.R")
 
 
 ### Data -----------------------------------------------------------------------
-# ## Single simulation
+# ## Single simulation (included in dat_all)
 # dat_svi <- read_delim(glue::glue("data/input/javiers_simulations/Simulations_fLAI_run00_com_SVIs.csv"), delim = ";", show_col_types = F) %>%
 #   glimpse()
 # dat_rao <- read_delim(glue::glue("data/input/javiers_simulations/Simulations_fLAI_run00_com_RaoQ.csv"), delim = ";", show_col_types = F) %>%
@@ -46,6 +46,7 @@ source("scripts/themes/MyPlotSpecs.R")
 ## Files names
 svi_list <- list.files(path = "data/input/javiers_simulations/", pattern = "_com_SVIs")
 rao_list <- list.files(path = "data/input/javiers_simulations/", pattern = "_com_RaoQ")
+spp_list <- list.files(path = "data/input/javiers_simulations/", pattern = "CommxSpAbundances")
 
 list_ids <- str_extract(svi_list, pattern = "run[:digit:]{2}") # str_extract(svi_list, pattern = "(?<=run)[:digit:]{2}") %>% as.integer()
 
@@ -53,36 +54,53 @@ list_ids <- str_extract(svi_list, pattern = "run[:digit:]{2}") # str_extract(svi
 dat_all_sim <- map(.f = read_delim, .x = paste0("data/input/javiers_simulations/", svi_list), delim = ";", show_col_types = F)
 dat_all_rao <- map(.f = read_delim, .x = paste0("data/input/javiers_simulations/", rao_list), delim = ";", show_col_types = F)
 
+## Species abundances tables
+dat_all_spp <- map(.f = read_delim, .x = paste0("data/input/javiers_simulations/", spp_list), delim = ";", show_col_types = F)
 
 
 ### Process data ---------------------------------------------------------------
 ## Flatten lists, pivot, and merge ----
-dat_all <- bind_rows(dat_all_sim, .id = "Simulation") %>% 
-  pivot_longer(cols = contains("comm_"), names_to = "Community", values_to = "Values") %>% 
-  mutate(Community = str_replace(Community, pattern = "_%d...", replacement = "")) %>% 
-  pivot_wider(names_from = Index, values_from = "Values") %>% 
-  left_join(
-    bind_rows(dat_all_rao, .id = "Simulation") %>% 
-      pivot_longer(cols = contains("comm_"), names_to = "Community", values_to = "Values") %>%
-      mutate(Community = str_replace(Community, pattern = "_%d...", replacement = "")) %>%
-      pivot_wider(names_from = Index, values_from = "Values"),
-    by = c("Simulation", "LAI", "Community")
+## Species x Community tables
+dat_all_biodiv <- dat_all_spp %>% 
+  bind_rows(.id = "Simulation") %>% 
+  rename(Community = Communities) %>% 
+  pivot_longer(cols = contains("Species_"), names_to = "Species", values_to = "Abundance") %>% 
+  ## Calculate Diversity indices of simulated communities
+  group_by(Simulation, Community) %>%
+  mutate(
+    Richness = length(Species[Abundance != 0 & !is.na(Abundance)]),
+    Shannon = -sum(Abundance * log(Abundance), na.rm = T), # Shannon (1948) (incl. n_spp, cover) cf. Spellerberg & Fedor, 2003 for controversy on index name/reference
+    Simpson = sum(Abundance^2, na.rm = T) # Simpson's index (1949)
+    ) %>%
+  ungroup() %>% 
+  dplyr::select(-Species, -Abundance) %>% 
+  unique()
+
+## Simulated vegetation indices and RaoQs
+dat_all <- bind_rows(
+  bind_rows(dat_all_sim, .id = "Simulation"),
+  bind_rows(dat_all_rao, .id = "Simulation")
   ) %>%
+  rename_with(.fn = unique, x = dat_all_biodiv$Community, .cols = contains("comm_")) %>% # correct Communities' names, likely wrong due to wrong export/import, i.e. column values included
+  pivot_longer(cols = contains("Com_"), names_to = "Community", values_to = "Values") %>% 
+  drop_na(Values) %>% 
+  pivot_wider(names_from = Index, values_from = "Values") %>% 
+  left_join(dat_all_biodiv, by = c("Simulation", "Community")) %>%
   mutate(Simulation = as.integer(Simulation) - 1) %>% # start with run00
   glimpse()
 
 
 ## Calculate derivative ----
-dat_all <- dat_all %>% 
-  group_by(Simulation, Community) %>% 
+dat_all <- dat_all %>%
+  group_by(Simulation, Community) %>%
   mutate(
     f1_LAI = c(diff(LAI), NA_real_),
     f1_NDVI = c(diff(NDVI), NA_real_) / f1_LAI,
     f1_NIRv = c(diff(NIRv), NA_real_) / f1_LAI,
     f1_RaoQ_NDVI = c(diff(RaoQ_NDVI), NA_real_) / f1_LAI,
     f1_RaoQ_NIRv = c(diff(RaoQ_NIRv), NA_real_) / f1_LAI
-  ) %>% 
-  ungroup() %>% 
+  ) %>%
+  ungroup() %>%
   glimpse()
 
 
@@ -100,72 +118,79 @@ dat_all_agg <- dat_all %>%
 
 ### Plot all simulations for supplementary figure ------------------------------
 ## Data for plotting ----
-dat_plot <- dat_all %>% dplyr::filter(Simulation == 0)
+dat_plot <- dat_all %>%
+  dplyr::filter(Simulation == 0) # only first simulation
 
 
 ## Specs ----
 theme_custom <- theme_bw() +
   theme_combine +
   theme(
-    legend.position = "none"
-  )
+    legend.position = "bottom",
+    legend.direction = "horizontal"
+    )
 
 # mypalette <- palette14_lumin
-mypalette <- colorRampPalette(Five_colorblind)(length(unique(dat_plot$Community))) # generate color palette
-set.seed(005); mypalette <- sample(mypalette) # randomize order
+mypalette <- Thirteen_safe #colorRampPalette(Eight_categorical2)(length(unique(dat_plot$Community))) # generate color palette
+# set.seed(005); mypalette <- sample(mypalette) # randomize order
 
 
 ## Subplots ----
 ## VIs
 p_ndvi <- dat_plot %>% 
-  ggplot(aes(x = LAI, y = NDVI, color = Community)) +
+  ggplot(aes(x = LAI, y = NDVI, color = Community, group = Community)) +
   geom_line(alpha = alpha_opaque, linewidth = line_width_medium, na.rm = T) +
   # geom_point(alpha = alpha_opaque, size = point_size_small, na.rm = T) +
   ylab("NDVI [-]") +
   # scale_x_continuous(expand = c(0, 0)) + # remove padding before and after limits
   scale_y_continuous(labels = ~ format(.x, nsmall = 2)) + # labels with 2 small digits
-  scale_color_manual(values = mypalette) + scale_fill_manual(values = mypalette) +
+  scale_color_manual(values = mypalette) + #scale_fill_manual(values = mypalette) +
   # scale_color_viridis_d(option = "D") +
-  theme_custom +
+  theme_custom + 
+  guides(color = guide_legend(nrow = 2, byrow = T, override.aes = list(linewidth = line_width_extracthick))) +
   NULL
 
 p_nirv <- dat_plot %>% 
-  ggplot(aes(x = LAI, y = NIRv, color = Community)) +
+  ggplot(aes(x = LAI, y = NIRv, color = Community, group = Community)) +
   geom_line(alpha = alpha_opaque, linewidth = line_width_medium, na.rm = T) +
   # geom_point(alpha = alpha_opaque, size = point_size_small, na.rm = T) +
   ylab("NIRv [-]") +
   # scale_x_continuous(expand = c(0, 0)) + # remove padding before and after limits
   scale_y_continuous(labels = ~ format(.x, nsmall = 2)) + # labels with 2 small digits
-  scale_color_manual(values = mypalette) + scale_fill_manual(values = mypalette) +
+  scale_color_manual(values = mypalette) + #scale_fill_manual(values = mypalette) +
   # scale_color_viridis_d(option = "D") +
-  theme_custom +
+  theme_custom + 
+  guides(color = guide_legend(nrow = 2, byrow = T, override.aes = list(linewidth = line_width_extracthick))) +
   NULL
 
 ## RaoQs
 p_raoq_ndvi <- dat_plot %>% 
-  ggplot(aes(x = LAI, y = RaoQ_NDVI, color = Community)) +
+  ggplot(aes(x = LAI, y = RaoQ_NDVI, color = Community, group = Community)) + #linetype = Community, 
   geom_line(alpha = alpha_opaque, linewidth = line_width_medium, na.rm = T) +
   # geom_point(alpha = alpha_opaque, size = point_size_small, na.rm = T) +
   xlab(expression(paste("LAI [",m^{2}," ", m^{-2},"]"))) +
   ylab(expression(paste(RaoQ[NDVI], " [-]"))) +
   # scale_x_continuous(expand = c(0, 0)) + # remove padding before and after limits
   scale_y_continuous(labels = ~ format(.x, nsmall = 2)) + # labels with 2 small digits
-  scale_color_manual(values = mypalette) + scale_fill_manual(values = mypalette) +
-  # scale_color_viridis_d(option = "H") +
-  theme_custom +
+  scale_color_manual(values = mypalette) + #scale_fill_manual(values = mypalette) +
+  # scale_color_viridis_d(option = "F") +
+  # scale_linetype_manual(values = rep(c("solid", "longdash"), length.out = length(unique(dat_plot$Community)))) +
+  theme_custom + 
+  guides(color = guide_legend(nrow = 2, byrow = T, override.aes = list(linewidth = line_width_extracthick))) +
   NULL
 
 p_raoq_nirv <- dat_plot %>% 
-  ggplot(aes(x = LAI, y = RaoQ_NIRv, color = Community)) +
+  ggplot(aes(x = LAI, y = RaoQ_NIRv, color = Community, group = Community)) +
   geom_line(alpha = alpha_opaque, linewidth = line_width_medium, na.rm = T) +
   # geom_point(alpha = alpha_opaque, size = point_size_small) +
   xlab(expression(paste("LAI [",m^{2}," ", m^{-2},"]"))) +
   ylab(expression(paste(RaoQ[NIRv], " [-]"))) +
   # scale_x_continuous(expand = c(0, 0)) + # remove padding before and after limits
   scale_y_continuous(labels = ~ format(.x, nsmall = 2)) + # labels with 2 small digits
-  scale_color_manual(values = mypalette) + scale_fill_manual(values = mypalette) +
-  # scale_color_viridis_d(option = "D") +
-  theme_custom +
+  scale_color_manual(values = mypalette) + #scale_fill_manual(values = mypalette) +
+  # scale_color_viridis_d(option = "B") +
+  theme_custom + 
+  guides(color = guide_legend(nrow = 2, byrow = T, override.aes = list(linewidth = line_width_extracthick))) +
   NULL
 
 ## Deltas/derivatives of RaoQs
@@ -195,26 +220,18 @@ p_delta_raoq_nirv <- dat_plot %>%
 ## Combine subplots ----
 p0 <- (
   (
-    ((p_ndvi |
-        p_nirv
+    (
+      (
+        (p_ndvi | p_nirv) &
+          theme(axis.title.x = element_blank(), axis.text.x = element_blank())
+      ) /
+        (p_raoq_ndvi | p_raoq_nirv)
     ) &
-      theme(axis.title.x = element_blank(), axis.text.x = element_blank()) #&
-      # ylim(c(0.1, 1))
-    ) /
-      ((p_raoq_ndvi |
-          p_raoq_nirv
-      ) #&
-        # ylim(c(0, 0.16)) #&
-        # theme(axis.title.x = element_blank(), axis.text.x = element_blank())
-      ) #/
-      # ((p_delta_raoq_ndvi |
-      #     p_delta_raoq_nirv) &
-      #    scale_y_continuous(breaks = c(-0.2, -0.1, 0, 0.1, 0.2),
-      #                       labels = c("-0.20", "-0.10", "0.00", "0.10", "0.20"), limits = c(-0.2, 0.2))
-      #   )
-  ) &
-    scale_x_continuous(limits = c(0, 15.5), expand = c(0, 0)) # remove padding before and after limits
+      scale_x_continuous(limits = c(0, 15.5), expand = c(0, 0)) # remove padding before and after limits
+  ) /
+    guide_area()
 ) +
+  plot_layout(heights = c(0.45, 0.45, 0.1), guides = "collect") +
   plot_annotation(tag_levels = "a")
 p0
 

@@ -43,7 +43,7 @@ source("scripts/themes/MyPlotSpecs.R")
 ### Data -----------------------------------------------------------------------
 dat <- read_csv(glue::glue("data/inter/data_efps_clim_struct_biodiv_{vers_in}.csv"), show_col_types = F) %>% 
   # dplyr::filter(!IGBP %in% c("DBF", "MF")) %>% # test with/without DBF/MF
-  dplyr::filter(!SITE_ID %in% c("HEAL", "TEAK", "TOOL")) %>%
+  # dplyr::filter(!SITE_ID %in% c("HEAL", "TEAK", "TOOL")) %>% # test with/without outliers
   glimpse()
 
 
