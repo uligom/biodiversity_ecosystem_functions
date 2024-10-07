@@ -11,7 +11,7 @@ rm(list = ls(all = T))
 # Data settings
 savedata <- as.logical(readline(prompt = "Save the output of the script? T/F:")) # ask if output should be saved
 dat_in <- "v06.06"
-vers_out <- dat_in
+vers_out <- paste0(dat_in, "_rev2")
 
 
 
@@ -347,14 +347,14 @@ cor.test(dat$Rao_Q_NIRv, dat$NDVI_max, method = "spearman")
 # 
 
 ## Combine subplots ----
-figure2 <- (p_lai_classes + theme(legend.position = "none") |
+figure3 <- (p_lai_classes + theme(legend.position = "none") |
               p_crown_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank())
               | p_height_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank())
               # | p_stem_diameter_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank())
 ) + plot_layout(guides = 'collect') + plot_annotation(tag_levels = "a")
-figure2
+figure3
 
-figure2plus <- (p_lai_classes + theme(legend.position = "none") |
+figure3plus <- (p_lai_classes + theme(legend.position = "none") |
     p_crown_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank(), legend.position = "none")
   | p_height_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank(), legend.position = "none")
   | p_ndvimax_classes + theme(axis.title.y = element_blank(), strip.text.y = element_blank(), legend.direction = "horizontal")
@@ -384,12 +384,15 @@ if (savedata) {
   #        width = 508, height = 285.75, units = "mm", dpi = 300) # 16:9 ratio
   
   ## Final plot
-  ggsave(filename = glue::glue("results/scatterplots/figure2_RaoQ_structure_boxplot_categories_{vers_out}.jpg"),
-         plot = figure2, device = "jpeg",
+  ggsave(filename = glue::glue("results/scatterplots/RaoQ_structure_boxplot_categories_{vers_out}.jpg"),
+         plot = figure3, device = "jpeg",
          width = 508, height = 285.75, units = "mm", dpi = 300) # 16:9 ratio
   
-  ggsave(filename = glue::glue("results/scatterplots/figure2plus_RaoQ_structure_boxplot_categories_{vers_out}.jpg"),
-         plot = figure2plus, device = "jpeg",
+  ggsave(filename = glue::glue("results/scatterplots/figure3_RaoQ_structure_boxplot_categories_{vers_out}.jpg"),
+         plot = figure3plus, device = "jpeg",
+         width = 600, height = 272.73, units = "mm", dpi = 300) # 11:5 ratio
+  ggsave(filename = glue::glue("results/scatterplots/figure3_RaoQ_structure_boxplot_categories_{vers_out}.pdf"),
+         plot = figure3plus, device = "pdf",
          width = 600, height = 272.73, units = "mm", dpi = 300) # 11:5 ratio
   
 }

@@ -109,7 +109,7 @@ source("scripts/plot_javiers_raoq_simulations.R") # simulated RaoQ (Figure 4)
 
 ### Figures 5, S3, S4, S5, S6, S8: Multimodel Inference ------------------------
 ## Average coefficients
-source("scripts/plot_mumin_relimp.R") # plot coeffs from  analyses based on different settings (incl. Figures 5, S3, S4, S5, S6)
+source("scripts/plot_mumin_relimp.R") # plot coefficients from  analyses based on different settings (incl. Figures 5, S3, S4, S5, S6)
 
 ## Figure S8: R2 and AICc
 source("scripts/plot_mumin_biodiv_evaluation.R") # compare different analyses (Figure S8)
@@ -139,8 +139,8 @@ Compile supplementary tables and materials.
 ### Table S1: Table of sites ---------------------------------------------------
 source("scripts/compile_site_table.R")
 
-### Figure S1. Map of NEON sites -----------------------------------------------
-source("scripts/plot_neon_map_and_period.R") # map of used sites (Figure S1)
+### Figures S1, S2: Map of NEON sites -----------------------------------------------
+source("scripts/plot_neon_map_and_period.R") # map of used sites (Figure S1 and Figure S2)
 
 ```
 

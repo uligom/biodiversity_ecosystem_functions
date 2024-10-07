@@ -10,7 +10,7 @@ rm(list = ls(all = T))
 ### Options --------------------------------------------------------------------
 # Data settings
 savedata <- T #as.logical(readline(prompt = "Save the output of the script? T/F:")) # ask if output should be saved
-vers_out <- "v03"
+vers_out <- "v03_rev2"
 
 
 
@@ -369,6 +369,9 @@ if (savedata) {
   ## Figure 4
   ggsave(filename = glue::glue("results/scatterplots/figure4_RaoQ_simulations_{vers_out}.jpg"),
          plot = p0, device = "jpeg",
+         width = 508, height = 285.75, units = "mm", dpi = 300) # 16:9 ratio
+  ggsave(filename = glue::glue("results/scatterplots/figure4_RaoQ_simulations_{vers_out}.pdf"),
+         plot = p0, device = "pdf",
          width = 508, height = 285.75, units = "mm", dpi = 300) # 16:9 ratio
   
   # ## Supplementary figure

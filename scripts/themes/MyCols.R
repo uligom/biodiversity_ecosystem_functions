@@ -65,7 +65,7 @@ CatCol <- c(
   "#C4AA4D", "#443396", "#CC99CC", "#88C44D", "#AB3232"
 )
 CatCol_igbp <- c(
-  CSH = "#586158", DBF = "#C46B39", EBF = "#4DD8C0", ENF = "#3885AB", GRA = "#9C4DC4",
+  CVM = "#586158", DBF = "#C46B39", EBF = "#4DD8C0", ENF = "#3885AB", GRA = "#9C4DC4", # since CSH not available, otherwise: CSH = "#586158"
   MF = "#C4AA4D", OSH = "#443396", SAV = "#CC99CC", WET = "#88C44D", WSA = "#AB3232"
 )
 Ten_sequential <- c("#F94144", "#F3722C", "#F8961E", "#F9844A", "#F9C74F",

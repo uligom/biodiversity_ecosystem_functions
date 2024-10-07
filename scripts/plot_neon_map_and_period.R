@@ -12,7 +12,7 @@ tic() # measure run time
 # Data settings
 vers_in <- "v11.06.06"
 savedata <- as.logical(readline(prompt = "Save the output of the script? T/F:")) # ask if output should be saved
-vers_out <- vers_in
+vers_out <- paste0(vers_in, "_rev2")
 
 
 

@@ -12,7 +12,7 @@ tic() # measure run time
 # Data settings
 savedata <- T #as.logical(readline(prompt = "Save the output of the script? T/F:")) # ask if output should be saved
 
-scale_vers <- "all" # what biodiversity subset? ("no"/"ground"/"satellite"/"all"/"main")
+scale_vers <- "main" # what biodiversity subset? ("no"/"ground"/"satellite"/"all"/"main")
 
 dat_in <- "v06.06"
 vers <- paste0("v11.", stringr::str_extract(dat_in, "[:digit:]+[:punct:]?[:digit:]+"))
@@ -272,6 +272,10 @@ for (bbb in 1:3) {
     # multimodel effects plot
     ggplot2::ggsave(filename = glue::glue("results/multimodel_inference/mumin_coefficients_{vers_out}.jpg"), plot = p_effects, device = "jpeg",
                     width = width, height = height, units = "mm", dpi = 300 * scal)
+    if (scale_vers == "main" & raoq_in == "nirv") {
+      ggplot2::ggsave(filename = glue::glue("results/multimodel_inference/mumin_coefficients_{vers_out}.pdf"), plot = p_effects, device = "pdf",
+                      width = width, height = height, units = "mm", dpi = 300 * scal)
+    }
     
     # # transparent png
     # ggplot2::ggsave(filename = glue::glue("results/multimodel_inference/mumin_coefficients_{vers_out}.png"), plot = p_effects, device = "png",

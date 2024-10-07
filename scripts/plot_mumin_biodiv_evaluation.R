@@ -15,7 +15,7 @@ dat_in <- "v06.06"
 vers_in <- paste0(raoq_in, "_v11.", stringr::str_extract(dat_in, "[:digit:]+[:punct:]?[:digit:]+"))
 savedata <- T #as.logical(readline(prompt = "Save the output of the script? T/F:")) # ask if output should be saved
 if (savedata) {
-  vers_out <- paste0(vers_in)
+  vers_out <- paste0(vers_in, "_rev2")
   eval_file <- glue::glue("results/analysis_evaluation/evaluation_multivariate_analysis_{vers_out}.txt")
   txt <- "Initializing analysis..."; print(txt); if (savedata) {cat(paste0(txt, "\n"), file = eval_file, append = F)}
 }
@@ -60,7 +60,7 @@ dat <- rbind(
   dat_ground %>% mutate(biodiv_subset = biodiv_scales[2]),
   dat_sat %>% mutate(biodiv_subset = biodiv_scales[3]),
   dat_all %>% mutate(biodiv_subset = biodiv_scales[4]),
-  dat_main %>% mutate(biodiv_subset = biodiv_scales[5])
+  dat_main %>% mutate(biodiv_subset = biodiv_scales[5]) %>% dplyr::select(-RMSE, -RMSE_loo)
   # ,dat_no_main %>% mutate(biodiv_subset = biodiv_scales[6])
   ) %>%
   glimpse()
